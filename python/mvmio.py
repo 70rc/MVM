@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import json
 
 mapping = {
   'default': [
@@ -72,51 +73,67 @@ def get_mvm_df(fname, sep=' -> ', configuration='default'):
   #data from the ventilator
   data = []
 
-  is_unix = False
-  columns = mapping[configuration]
-  print ("This is the chosen column mapping for the MVM file: ", columns)
+  if configuration == "json_triumf_0":
+    is_unix = True
+    with open(fname) as json_file:
+      json_data = json.load(json_file)['data']
+    for json_record in json_data:
+      dataline = {
+          'date' = json_record['ts'],
+          'flux' = json_record['fs1_r'],
+          'airway_pressure' = json_record['ps1_p']
+          'in' = 0 if json_record['inlet'] == "CLOSED" else 1,
+          'out' = 0 if json_record['outlet'] == "CLOSED" else 1,
+          # TODO
+          'pressure_pv1' = 0
+          }
+      data.append(dataline)
+  else:
+    is_unix = False
+    columns = mapping[configuration]
+    print ("This is the chosen column mapping for the MVM file: ", columns)
 
-  with open(fname) as f:
-    lines = f.readlines()
-    for iline, line in enumerate(lines):
-      if iline == 0: continue # skip first line
+    with open(fname) as f:
+      lines = f.readlines()
+      for iline, line in enumerate(lines):
+        if iline == 0: continue # skip first line
 
-      line = line.strip()
-      line = line.strip('\n')
-      if not line: continue
-      l = line.split(sep)
-      try:
-        par = sep.join(l[1:]).split(',')
-      except :
-        print (line)
-        continue
-      # remove unformatted lines
-      try:
-        for x in par: float(x)
-      except ValueError:
-        continue
+        line = line.strip()
+        line = line.strip('\n')
+        if not line: continue
+        l = line.split(sep)
+        try:
+          par = sep.join(l[1:]).split(',')
+        except :
+          print (line)
+          continue
+        # remove unformatted lines
+        try:
+          for x in par: float(x)
+        except ValueError:
+          continue
 
-      t = l[0]
-      if ':' not in l[0]:
-        t = float(l[0]) # in this way, t is either a string (if HHMMSS) or a float
-        is_unix = True
+        t = l[0]
+        if ':' not in l[0]:
+          t = float(l[0]) # in this way, t is either a string (if HHMMSS) or a float
+          is_unix = True
 
-      if ( "mvm_col_no_time" in configuration  ) :
-        dataline = dict ( zip ( columns[0:10], [float(i) for i in par[0:10]]  )   )
-        step = 0.012 #s
-        dataline['date']  = iline * step
-        data.append(  dataline )
-        is_unix = True
-      elif (configuration == "mvm_col_arduino") :
-        dataline = dict ( zip ( columns[2:11], [float(i) for i in par[1:10]]  )   )
-        dataline['date'] = float ( par[0] )  * 1e-3
-        is_unix = True
-        #dataline['date'] = t
-        data.append(  dataline )
-      else :  #default
-        dataline = dict (   zip ( columns[1:8], [float(i) for i in par[0:7]]  )   )
-        dataline['date'] = t
-        data.append( dataline )
+        if ( "mvm_col_no_time" in configuration  ) :
+          dataline = dict ( zip ( columns[0:10], [float(i) for i in par[0:10]]  )   )
+          step = 0.012 #s
+          dataline['date']  = iline * step
+          data.append(  dataline )
+          is_unix = True
+        elif (configuration == "mvm_col_arduino") :
+          dataline = dict ( zip ( columns[2:11], [float(i) for i in par[1:10]]  )   )
+          dataline['date'] = float ( par[0] )  * 1e-3
+          is_unix = True
+          #dataline['date'] = t
+          data.append(  dataline )
+        else :  #default
+          dataline = dict (   zip ( columns[1:8], [float(i) for i in par[0:7]]  )   )
+          dataline['date'] = t
+          data.append( dataline )
 
   is_manual = False
   df = pd.DataFrame(data)
