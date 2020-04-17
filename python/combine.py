@@ -616,7 +616,7 @@ if __name__ == '__main__':
     # compute the file location: local folder to the data repository + compaign folder + MVM folder + filename
     fullpath_mvm = f'{args.input}/{meta[objname]["Campaign"]}/{meta[objname]["MVM_dirname"]}/{meta[objname]["MVM_filename"]}'
     if not fullpath_mvm.endswith(".txt"):
-      if meta[objname]["MVM_filename"] == "json":
+      if meta[objname]["MVM_mapping"] == "json":
         suffix_mvm = "json"
       else:
         suffix_mvm = "txt"
