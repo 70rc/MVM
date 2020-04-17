@@ -643,7 +643,7 @@ if __name__ == '__main__':
     fullpath_dta = fullpath_rwa.replace('rwa', 'dta')
     print(f'will retrieve RWA and DTA simulator data from {fullpath_rwa} and {fullpath_dta}')
 
-    mvm_mapping = meta['MVM_mapping'] if meta['MVM_mapping'] is not None else args.mvm_col
+    mvm_mapping = meta[objname]['MVM_mapping'] if meta[objname]['MVM_mapping'] is not None else args.mvm_col
 
     # run
     process_run(meta, objname=objname, input_mvm=fullpath_mvm, fullpath_rwa=fullpath_rwa, fullpath_dta=fullpath_dta, columns_rwa=columns_rwa, columns_dta=columns_dta, save=args.save, manual_offset=args.offset,  ignore_sim=args.ignore_sim, mvm_sep=args.mvm_sep, output_directory=args.output_directory, mvm_columns=mvm_mapping)
