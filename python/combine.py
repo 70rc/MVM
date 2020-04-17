@@ -613,23 +613,27 @@ if __name__ == '__main__':
 
     objname = f'{filename}_0'   #at least first element is always there
 
-    # compute the file location: local folder to the data repository + compaign folder + filename
-    fname = f'{args.input}/{meta[objname]["Campaign"]}/{meta[objname]["MVM_filename"]}'
-    if not fname.endswith(".txt"):
-      fname = f'{fname}.txt'
+    # compute the file location: local folder to the data repository + compaign folder + MVM folder + filename
+    fullpath_mvm = f'{args.input}/{meta[objname]["Campaign"]}/{meta[objname]["MVM_dirname"]}/{meta[objname]["MVM_filename"]}'
+    if not fullpath_mvm.endswith(".txt"):
+      if meta[objname]["MVM_filename"] == "json":
+        suffix_mvm = "json"
+      else:
+        suffix_mvm = "txt"
+      fullpath_mvm = f'{fullpath_mvm}.{suffix_mvm}'
 
-    print(f'\nFile name {fname}')
-    if fname.split('/')[-1] in args.skip_files:
+    print(f'\nFile name {fullpath_mvm}')
+    if fullpath_mvm.split('/')[-1] in args.skip_files:
       print('    ... skipped')
       continue
 
     if args.campaign:
-      if args.campaign not in fname:
+      if args.campaign not in fullpath_mvm:
         print(f'    ... not in selected campaign {args.campaign}')
         continue
 
     # determine RWA and DTA data locations
-    fullpath_rwa = f'{args.input}/{meta[objname]["Campaign"]}/{meta[objname]["SimulatorFileName"]}'
+    fullpath_rwa = f'{args.input}/{meta[objname]["Campaign"]}/{meta[objname]["SimulatorDirName"]}/{meta[objname]["SimulatorFileName"]}'
 
     if fullpath_rwa.endswith('.dta'):
       fullpath_rwa =  fullpath_rwa[:-4]      #remove extension if dta
@@ -639,8 +643,10 @@ if __name__ == '__main__':
     fullpath_dta = fullpath_rwa.replace('rwa', 'dta')
     print(f'will retrieve RWA and DTA simulator data from {fullpath_rwa} and {fullpath_dta}')
 
+    mvm_mapping = meta['MVM_mapping'] if meta['MVM_mapping'] is not None else args.mvm_col
+
     # run
-    process_run(meta, objname=objname, input_mvm=fname, fullpath_rwa=fullpath_rwa, fullpath_dta=fullpath_dta, columns_rwa=columns_rwa, columns_dta=columns_dta, save=args.save, manual_offset=args.offset,  ignore_sim=args.ignore_sim, mvm_sep=args.mvm_sep, output_directory=args.output_directory, mvm_columns=args.mvm_col)
+    process_run(meta, objname=objname, input_mvm=fullpath_mvm, fullpath_rwa=fullpath_rwa, fullpath_dta=fullpath_dta, columns_rwa=columns_rwa, columns_dta=columns_dta, save=args.save, manual_offset=args.offset,  ignore_sim=args.ignore_sim, mvm_sep=args.mvm_sep, output_directory=args.output_directory, mvm_columns=mvm_mapping)
 
   if args.plot:
     if ( len (filenames) < 2 ) :
