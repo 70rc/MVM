@@ -85,6 +85,7 @@ def get_mvm_df(fname, sep=' -> ', configuration='default'):
           'in' : 0 if json_record['inlet'] == "CLOSED" else 1,
           'out' : 0 if json_record['outlet'] == "CLOSED" else 1,
           # TODO
+          'flux_3' : json_record['fs1_r'],
           'pressure_pv1' : 0
           }
       data.append(dataline)
