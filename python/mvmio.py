@@ -73,7 +73,7 @@ def get_mvm_df(fname, sep=' -> ', configuration='default'):
   #data from the ventilator
   data = []
 
-  if configuration == "json_triumf_0":
+  if configuration == "json":
     is_unix = True
     with open(fname) as json_file:
       json_data = json.load(json_file)['data']
