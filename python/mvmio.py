@@ -79,13 +79,13 @@ def get_mvm_df(fname, sep=' -> ', configuration='default'):
       json_data = json.load(json_file)['data']
     for json_record in json_data:
       dataline = {
-          'date' = json_record['ts'],
-          'flux' = json_record['fs1_r'],
-          'airway_pressure' = json_record['ps1_p']
-          'in' = 0 if json_record['inlet'] == "CLOSED" else 1,
-          'out' = 0 if json_record['outlet'] == "CLOSED" else 1,
+          'date' : json_record['ts'],
+          'flux' : json_record['fs1_r'],
+          'airway_pressure' : json_record['ps1_p']
+          'in' : 0 if json_record['inlet'] == "CLOSED" else 1,
+          'out' : 0 if json_record['outlet'] == "CLOSED" else 1,
           # TODO
-          'pressure_pv1' = 0
+          'pressure_pv1' : 0
           }
       data.append(dataline)
   else:
