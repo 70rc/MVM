@@ -81,7 +81,7 @@ def get_mvm_df(fname, sep=' -> ', configuration='default'):
       dataline = {
           'date' : json_record['ts'],
           'flux' : json_record['fs1_r'],
-          'airway_pressure' : json_record['ps1_p']
+          'airway_pressure' : json_record['ps1_p'],
           'in' : 0 if json_record['inlet'] == "CLOSED" else 1,
           'out' : 0 if json_record['outlet'] == "CLOSED" else 1,
           # TODO
